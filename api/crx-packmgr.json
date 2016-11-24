@@ -1,0 +1,7 @@
+{
+  "gemName": "crx_packmgr_api_client",
+  "moduleName": "CrxPackageManager",
+  "gemVersion": "0.1.0",
+  "gitUserId": "bstopp",
+  "gitRepoId": "crx_packmgr_api_client"
+}

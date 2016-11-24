@@ -1,0 +1,172 @@
+swagger: '2.0'
+info:
+  title: CRX Package Manager API
+  description: 'API for interacting with the CRX Package Manager in AEM.'
+  contact:
+    name: Bryan Stopp
+    email: bryan.stopp@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: '1.0.0'
+
+host: localhost:4502
+basePath: /crx/packmgr
+
+consumes:
+  - application/x-www-form-urlencoded
+  - multipart/form-data
+produces:
+  - text/plain
+  - text/html
+  - application/json
+  - application/xml
+schemes:
+  - http
+  - https
+paths:
+  /list.jsp:
+    get:
+      summary: List all available packages.
+      description: Returns a list of all available packages defined.
+      operationId: list
+      parameters:
+        - name: q
+          in: query
+          description: Term to search within package names.
+          type: string
+        - name: includeVersions
+          in: query
+          description: Include versions of package in results.
+          type: boolean
+        - name: path
+          in: query
+          description: The path to a specific package definition.
+          type: string
+      responses:
+        '200':
+          description: Successful Listing
+          schema:
+            $ref: '#/definitions/PackageList'
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+
+definitions:
+  PackageList:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/Package'
+  Package:
+    type: object
+    properties:
+      pid:
+        type: string
+      path:
+        type: string
+      name:
+        type: string
+      downloadName:
+        type: string
+      group:
+        type: string
+      groupTitle:
+        type: string
+      version:
+        type: string
+      description:
+        type: string
+      thumbnail:
+        type: string
+      buildCount:
+        type: integer
+        format: int64
+      lastModified:
+        type: integer
+        format: int64
+      lastModifiedBy:
+        type: string
+      created:
+        type: integer
+        format: int64
+      createBy:
+        type: string
+      lastUnpacked:
+        type: integer
+        format: int64
+      lastUnpackedBy:
+        type: string
+      lastWrapped:
+        type: integer
+        format: int64
+      lastWrappedBy:
+        type: string
+      lastUnwrapped:
+        type: integer
+        format: int64
+      lastUnwrappedBy:
+        type: string
+      size:
+        type: integer
+        format: int64
+      hasSnapshot:
+        type: boolean
+      needsRewrap:
+        type: boolean
+      builtWith:
+        type: string
+      testedWith:
+        type: string
+      fixedBugs:
+        type: string
+      requiresRoot:
+        type: boolean
+      requiresRestart:
+        type: boolean
+      acHandling:
+        type: string
+      dependencies:
+        type: array
+        items:
+          type: string
+      resolved:
+        type: boolean
+      filter:
+        type: array
+        items:
+          type: object
+          properties:
+            root:
+              type: string
+            rules:
+              type: array
+              items:
+                type: string
+      screenshots:
+        type: array
+        items:
+          type: string
+
+
+#parameters:
+
+responses:
+  LoginRedirect:
+    description: Redirected to Login
+  Unauthorized:
+    description: Unauthorized
+
+securityDefinitions:
+  basic:
+    type: basic
+
+security:
+  - basic: []
+
+externalDocs:
+  description: AEM Package Manager documentation.
+  url: 'https://docs.adobe.com/docs/en/aem/6-2/administer/content/package-manager.html'
