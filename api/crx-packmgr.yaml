@@ -13,23 +13,112 @@ info:
 host: localhost:4502
 basePath: /crx/packmgr
 
-consumes:
-  - application/x-www-form-urlencoded
-  - multipart/form-data
-produces:
-  - text/plain
-  - text/html
-  - application/json
-  - application/xml
 schemes:
   - http
   - https
 paths:
+  /download.jsp:
+    get:
+      summary: Download a package
+      description: Downloads the package at the specified path. Returns a Tempfile object.
+      operationId: download
+      produces:
+        - application/octet-stream
+        - application/zip
+      parameters:
+        - name: path
+          in: query
+          description: The path to the package to download.
+          type: string
+      responses:
+        '200':
+          description: Successful
+          schema:
+            type: file
+        '403':
+          $ref: '#/responses/Forbidden'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+  /groups.jsp:
+    get:
+      summary: List package groups
+      description: Returns a list of all package groups available.
+      operationId: groups
+      produces:
+        - application/json
+      parameters:
+        - name: compressVersion
+          in: query
+          description: Compress versions; count all versions of the same packages as a single entry.
+          type: string
+        - name: includeAll
+          in: query
+          description: Return a total count of all packages. Default to false.
+          type: boolean
+        - name: includeRoot
+          in: query
+          description: Include the root package. Defaults to false.
+          type: boolean
+        - name: includeMyPackages
+          in: query
+          description: Include the 'my_packages' group. Only applicable if the group has no packages. Default to false.
+          type: boolean
+        - name: onlyTopLevel
+          in: query
+          description: Only list top-level groups, ie. do not list all nested groups.
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/GroupList'
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '500':
+          $ref: '#/responses/ServerError'
+  /init.jsp:
+    get:
+      summary: Metadata
+      description: Display metadata about this package manager.
+      operationId: init
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/InitData'
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '500':
+          $ref: '#/responses/ServerError'
+  /installstatus.jsp:
+    get:
+      summary: Package Installation Status
+      description: Returns a status of the installation of OSGi packages.
+      operationId: installstatus
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/InstallStatus'
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '500':
+          $ref: '#/responses/ServerError'
   /list.jsp:
     get:
-      summary: List all available packages.
+      summary: List packages
       description: Returns a list of all available packages defined.
       operationId: list
+      produces:
+        - application/json
       parameters:
         - name: q
           in: query
@@ -45,22 +134,340 @@ paths:
           type: string
       responses:
         '200':
-          description: Successful Listing
+          description: Successful
           schema:
             $ref: '#/definitions/PackageList'
         '302':
           $ref: '#/responses/LoginRedirect'
         '401':
           $ref: '#/responses/Unauthorized'
+        '500':
+          $ref: '#/responses/ServerError'
+  /screenshot.jsp:
+    get:
+      summary: Get screenshot
+      description: Returns the screenshot at the specified path.
+      operationId: screenshot
+      produces:
+        - image/jpg
+        - image/jpeg
+        - image/png
+      parameters:
+        - name: path
+          in: query
+          description: The path to the screenshot.
+          type: string
+      responses:
+        '200':
+          description: Successful
+          schema:
+            type: file
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+  /service.jsp:
+    get:
+      summary: Generic operation service.
+      description: Provides endpoint for executing package manipulation commands.
+      operationId: service_get
+      produces:
+        - application/octet-stream
+        - application/zip
+        - text/plain
+      parameters:
+        - name: cmd
+          in: query
+          description: The command to execute.
+          required: true
+          type: string
+          enum:
+            - help
+            - ls
+            - rm
+            - build
+            - inst
+            - uninst
+            - get
+        - name: name
+          in: query
+          description: The name of the package on which to execute the command.
+          type: string
+        - name: group
+          in: query
+          description: The group of the package on which to execute the command.
+          type: string
+        - name: strict
+          in: query
+          description: Fail on an error.
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          schema:
+            type: string
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+    post:
+      summary: Generic operation service.
+      description: Provides endpoint for
+      operationId: service_post
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: file
+          in: formData
+          description: Package file to upload
+          required: true
+          type: file
+        - name: name
+          in: formData
+          description: The hint for the package's name if the definiton doesn't have one.
+          type: string
+        - name: strict
+          in: formData
+          description: Fail on an error.
+          type: boolean
+        - name: force
+          in: formData
+          description: Force the package upload.
+          type: boolean
+        - name: install
+          in: formData
+          description: Install the package upon upload
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          schema:
+            type: string
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+  /thumbnail.jsp:
+    get:
+      summary: Get package thumbnail
+      description: Returns the package's thumbnail image.
+      operationId: thumbnail
+      produces:
+        - image/jpg
+        - image/jpeg
+        - image/png
+      parameters:
+        - name: path
+          in: query
+          description: The path to the package.
+          type: string
+      responses:
+        '200':
+          description: Successful
+          schema:
+            type: file
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+  /update.jsp:
+    post:
+      summary: Update a package
+      description: Updates a package definition. Returns an UpdateStatus definition, but must be manually parsed due to MIME type incompatibilities. Note that if the name, group or version changes, this changes the path to the package for the next update or listing.
+      operationId: update
+      consumes:
+        - multipart/form-data
+      produces:
+        - text/html
+      parameters:
+        - name: path
+          in: formData
+          description: The path to the package which needs updating.
+          required: true
+          type: string
+        - name: packageName
+          in: formData
+          description: The package's name.
+          required: true
+          type: string
+        - name: groupName
+          in: formData
+          description: The package's group.
+          type: string
+        - name: version
+          in: formData
+          description: The version for the package.
+          type: string
+        - name: description
+          in: formData
+          description: The description for the package.
+          type: string
+        - name: thumbnail
+          in: formData
+          description: The thumbnail for the package.
+          type: file
+        - name: filter
+          in: formData
+          description: The filters for the package. The structure is specified in FilterData definition.
+          type: string
+        - name: testedWith
+          in: formData
+          description: 'Product name and version this package is targeted for or is compatible with. eg: CQ 5.3'
+          type: string
+        - name: fixedBugs
+          in: formData
+          description: List of fixed bugs or issues.
+          type: string
+        - name: dependencies
+          in: formData
+          description: Packages on which this one depends.
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: replaces
+          in: formData
+          description: List of packages this one replaces.
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        - name: providerName
+          in: formData
+          description: 'Name of the provider. eg: Adobe Systems Incorporated'
+          type: string
+        - name: providerUrl
+          in: formData
+          description: 'URL of the provider. eg: http://www.adobe.com'
+          type: string
+        - name: providerLink
+          in: formData
+          description: 'Package specific link to a provider page. eg: http://www.adobe.com/mypackage.html'
+          type: string
+        - name: requiresRoot
+          in: formData
+          description: Specifies if this package requires root to install.
+          type: boolean
+        - name: requiresRestart
+          in: formData
+          description: Specifies if this package requires a restart upon installation.
+          type: boolean
+        - name: acHandling
+          in: formData
+          description: How to handle ACL rules when installing the package.
+          type: string
+          enum:
+            - '-'
+            - 'ignore'
+            - 'overwrite'
+            - 'merge'
+            - 'merge_preserve'
+            - 'clear'
+        - name: screenshot
+          in: formData
+          description: Screen shot images for this package
+          type: file
+        - name: screenshotConfig
+          in: formData
+          description: Configuration details for existing screenshots. The structure is specified in ScreenshotConfig definition.
+          type: string
+      responses:
+        '200':
+          description: Successful
+          schema:
+            type: string
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
 
 definitions:
-  PackageList:
+  FilterData:
+    type: array
+    items:
+      type: object
+      properties:
+        root:
+          type: string
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              modifier:
+                type: string
+                enum:
+                  - exclude
+                  - include
+              pattern:
+                type: string
+  Group:
     type: object
     properties:
-      results:
+      name:
+        type: string
+      title:
+        type: string
+      count:
+        type: integer
+        format: int64
+      deepCount:
+        type: integer
+        format: int64
+  GroupList:
+    type: object
+    properties:
+      groups:
         type: array
         items:
-          $ref: '#/definitions/Package'
+          $ref: '#/definitions/Group'
+  InitData:
+    type: object
+    properties:
+      contextPath:
+        type: string
+      launchpadContextPath:
+        type: string
+      jcrVersion:
+        type: string
+      workspace:
+        type: string
+      userID:
+        type: string
+      workspaces:
+        type: array
+        items:
+          type: string
+  InstallStatus:
+    type: object
+    properties:
+      status:
+        type: object
+        properties:
+          finished:
+            type: string
+          itemCount:
+            type: string
   Package:
     type: object
     properties:
@@ -150,15 +557,73 @@ definitions:
         type: array
         items:
           type: string
-
-
-#parameters:
-
+  PackageList:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/Package'
+  ScreenshotConfig:
+    type: array
+    items:
+      type: object
+      properties:
+        upload:
+          type: boolean
+        path:
+          type: string
+  ServiceResponse:
+    type: object
+    properties:
+      version:
+        type: string
+      user:
+        type: string
+      workspace:
+        type: string
+      request:
+        type: object
+        properties:
+          param:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: string
+      response:
+        type: object
+        properties:
+          data:
+            type: object
+          status:
+            type: object
+            properties:
+              code:
+                type: int
+  UpdateStatus:
+    type: object
+    properties:
+      success:
+        type: boolean
+      msg:
+        type: string
+      path:
+        type: string
 responses:
   LoginRedirect:
     description: Redirected to Login
   Unauthorized:
     description: Unauthorized
+  Forbidden:
+    description: Forbidden (ACL)
+  NotFound:
+    description: Not Found
+  ServerError:
+    description: Server Error
 
 securityDefinitions:
   basic:
