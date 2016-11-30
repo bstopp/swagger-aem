@@ -1,0 +1,109 @@
+swagger: '2.0'
+info:
+  title: Apache Felix API
+  description: 'API for interacting with an Apache Felix system.'
+  contact:
+    name: Bryan Stopp
+    email: bryan.stopp@gmail.com
+  license:
+    name: Apache-2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: '1.0.0'
+
+host: localhost:8080
+basePath: /system/console
+
+schemes:
+  - http
+  - https
+
+paths:
+  /bundles.json:
+    get:
+      summary: Bundles list
+      description: List all the bundles in the Felix system. Properties for a bundle will not be populated.
+      operationId: bundles
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/BundleList'
+
+        '500':
+          $ref: '#/responses/ServerError'
+
+definitions:
+  Bundle:
+    type: object
+    properies:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      fragment:
+        type: boolean
+      state:
+        type: string
+        enum:
+          - UNINSTALLED
+          - INSTALLED
+          - RESOLVED
+          - STARTING
+          - STOPPING
+          - ACTIVE
+      version:
+        type: string
+      symbolicName:
+        type: string
+      category:
+        type: string
+      props:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: array
+              items:
+                type: string
+  BundleList:
+    type: object
+    properties:
+      status:
+        type: string
+      s:
+        type: array
+        items:
+          type: string
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Bundle'
+
+responses:
+  LoginRedirect:
+    description: Redirected to Login
+  Unauthorized:
+    description: Unauthorized
+  Forbidden:
+    description: Forbidden (ACL)
+  NotFound:
+    description: Not Found
+  ServerError:
+    description: Server Error
+
+securityDefinitions:
+  basic:
+    type: basic
+
+security:
+  - basic: []
+
+externalDocs:
+  description: Apache Felix Documentation
+  url: 'http://felix.apache.org/documentation.html'
