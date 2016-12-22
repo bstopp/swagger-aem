@@ -21,4 +21,3 @@ begin
 rescue ApacheFelix::ApiError => e
   puts "Exception when calling DefaultApi->bundles: #{e}"
 end
-

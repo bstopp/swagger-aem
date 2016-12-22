@@ -6,9 +6,9 @@ info:
     name: Bryan Stopp
     email: bryan.stopp@gmail.com
   license:
-    name: Apache 2.0
+    name: Apache-2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-  version: '1.0.0'
+  version: '6.2.0'
 
 host: localhost:4502
 basePath: /crx/packmgr
@@ -55,7 +55,7 @@ paths:
           type: string
         - name: includeAll
           in: query
-          description: Return a total count of all packages. Default to false.
+          description: Return a total count of all packages. Defaults to false.
           type: boolean
         - name: includeRoot
           in: query
@@ -63,7 +63,7 @@ paths:
           type: boolean
         - name: includeMyPackages
           in: query
-          description: Include the 'my_packages' group. Only applicable if the group has no packages. Default to false.
+          description: Include the 'my_packages' group. Only applicable if the group has no packages. Defaults to false.
           type: boolean
         - name: onlyTopLevel
           in: query
@@ -173,7 +173,7 @@ paths:
   /service.jsp:
     get:
       summary: Generic operation service.
-      description: Provides endpoint for executing package manipulation commands.
+      description: Provides endpoint for executing package manipulation commands. Responses are in the format of the ServiceResponse in the defintions section.
       operationId: service_get
       produces:
         - application/octet-stream
@@ -220,7 +220,7 @@ paths:
           $ref: '#/responses/ServerError'
     post:
       summary: Generic operation service.
-      description: Provides endpoint for
+      description: Provides endpoint for executing package manipulation commands. Responses are in the format of the ServiceResponse in the defintions section.
       operationId: service_post
       consumes:
         - multipart/form-data
@@ -286,141 +286,27 @@ paths:
           $ref: '#/responses/NotFound'
         '500':
           $ref: '#/responses/ServerError'
-  /update.jsp:
-    post:
-      summary: Update a package
-      description: Updates a package definition. Returns an UpdateStatus definition, but must be manually parsed due to MIME type incompatibilities. Note that if the name, group or version changes, this changes the path to the package for the next update or listing.
-      operationId: update
-      consumes:
-        - multipart/form-data
-      produces:
-        - text/html
-      parameters:
-        - name: path
-          in: formData
-          description: The path to the package which needs updating.
-          required: true
-          type: string
-        - name: packageName
-          in: formData
-          description: The package's name.
-          required: true
-          type: string
-        - name: groupName
-          in: formData
-          description: The package's group.
-          type: string
-        - name: version
-          in: formData
-          description: The version for the package.
-          type: string
-        - name: description
-          in: formData
-          description: The description for the package.
-          type: string
-        - name: thumbnail
-          in: formData
-          description: The thumbnail for the package.
-          type: file
-        - name: filter
-          in: formData
-          description: The filters for the package. The structure is specified in FilterData definition.
-          type: string
-        - name: testedWith
-          in: formData
-          description: 'Product name and version this package is targeted for or is compatible with. eg: CQ 5.3'
-          type: string
-        - name: fixedBugs
-          in: formData
-          description: List of fixed bugs or issues.
-          type: string
-        - name: dependencies
-          in: formData
-          description: Packages on which this one depends.
-          type: array
-          items:
-            type: string
-          collectionFormat: multi
-        - name: replaces
-          in: formData
-          description: List of packages this one replaces.
-          type: array
-          items:
-            type: string
-          collectionFormat: multi
-        - name: providerName
-          in: formData
-          description: 'Name of the provider. eg: Adobe Systems Incorporated'
-          type: string
-        - name: providerUrl
-          in: formData
-          description: 'URL of the provider. eg: http://www.adobe.com'
-          type: string
-        - name: providerLink
-          in: formData
-          description: 'Package specific link to a provider page. eg: http://www.adobe.com/mypackage.html'
-          type: string
-        - name: requiresRoot
-          in: formData
-          description: Specifies if this package requires root to install.
-          type: boolean
-        - name: requiresRestart
-          in: formData
-          description: Specifies if this package requires a restart upon installation.
-          type: boolean
-        - name: acHandling
-          in: formData
-          description: How to handle ACL rules when installing the package.
-          type: string
-          enum:
-            - '-'
-            - 'ignore'
-            - 'overwrite'
-            - 'merge'
-            - 'merge_preserve'
-            - 'clear'
-        - name: screenshot
-          in: formData
-          description: Screen shot images for this package
-          type: file
-        - name: screenshotConfig
-          in: formData
-          description: Configuration details for existing screenshots. The structure is specified in ScreenshotConfig definition.
-          type: string
-      responses:
-        '200':
-          description: Successful
-          schema:
-            type: string
-        '302':
-          $ref: '#/responses/LoginRedirect'
-        '401':
-          $ref: '#/responses/Unauthorized'
-        '404':
-          $ref: '#/responses/NotFound'
-        '500':
-          $ref: '#/responses/ServerError'
 
 definitions:
-  FilterData:
-    type: array
-    items:
-      type: object
-      properties:
-        root:
-          type: string
-        rules:
-          type: array
-          items:
-            type: object
-            properties:
-              modifier:
-                type: string
-                enum:
-                  - exclude
-                  - include
-              pattern:
-                type: string
+  Filter:
+    type: object
+    properties:
+      root:
+        type: string
+      rules:
+        type: array
+        items:
+          $ref: '#/definitions/FilterRule'
+  FilterRule:
+    type: object
+    properties:
+      modifier:
+        type: string
+        enum:
+          - exclude
+          - include
+      pattern:
+        type: string
   Group:
     type: object
     properties:
@@ -465,9 +351,10 @@ definitions:
         type: object
         properties:
           finished:
-            type: string
+            type: boolean
           itemCount:
-            type: string
+            type: integer
+            format: int64
   Package:
     type: object
     properties:
@@ -545,14 +432,7 @@ definitions:
       filter:
         type: array
         items:
-          type: object
-          properties:
-            root:
-              type: string
-            rules:
-              type: array
-              items:
-                type: string
+          $ref: '#/definitions/Filter'
       screenshots:
         type: array
         items:
@@ -564,15 +444,9 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Package'
-  ScreenshotConfig:
-    type: array
-    items:
-      type: object
-      properties:
-        upload:
-          type: boolean
-        path:
-          type: string
+      total:
+        type: integer
+        format: int64
   ServiceResponse:
     type: object
     properties:

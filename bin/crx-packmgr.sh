@@ -26,6 +26,6 @@ then
 fi
 
 export JAVA_OPTS="${JAVA_OPTS} -Xmx1024M -DloggerPath=conf/log4j.properties"
-ags="$@ generate -i api/crx-packmgr.yaml -l ruby -t templates -c api/crx-packmgr.json -o client/crx-packmgr"
+ags="$@ generate -i api/crx-packmgr.yaml -l ruby -t templates -c api/crx-packmgr.json -o clients/crx-packmgr"
 
 java $JAVA_OPTS -jar $executable $ags

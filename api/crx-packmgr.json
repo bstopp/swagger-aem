@@ -1,7 +1,9 @@
 {
   "gemName": "crx_packmgr_api_client",
+  "gemHomepage": "https://github.com/bstopp/crx-packmgr-api-client-gem",
   "moduleName": "CrxPackageManager",
-  "gemVersion": "0.2.0",
+  "gemVersion": "1.1.0",
   "gitUserId": "bstopp",
-  "gitRepoId": "crx_packmgr_api_client"
+  "gitRepoId": "crx-packmgr-api-client-gem",
+  "gemLicense": "Apache-2.0"
 }

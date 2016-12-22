@@ -26,6 +26,6 @@ then
 fi
 
 export JAVA_OPTS="${JAVA_OPTS} -Xmx1024M -DloggerPath=conf/log4j.properties"
-ags="$@ generate -i api/felix.yaml -l ruby -t templates -c api/felix.json -o clients/felix"
+ags="$@ generate -i api/sling.yaml -l ruby -t templates -c api/sling.json -o clients/sling"
 
 java $JAVA_OPTS -jar $executable $ags

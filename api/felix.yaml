@@ -30,14 +30,13 @@ paths:
           description: Successful
           schema:
             $ref: '#/definitions/BundleList'
-
         '500':
           $ref: '#/responses/ServerError'
 
 definitions:
   Bundle:
     type: object
-    properies:
+    properties:
       id:
         type: integer
         format: int64
@@ -48,12 +47,13 @@ definitions:
       state:
         type: string
         enum:
-          - UNINSTALLED
-          - INSTALLED
-          - RESOLVED
-          - STARTING
-          - STOPPING
-          - ACTIVE
+          - Uninstalled
+          - Installed
+          - Resolved
+          - Starting
+          - Stopping
+          - Active
+          - Fragment
       version:
         type: string
       symbolicName:
