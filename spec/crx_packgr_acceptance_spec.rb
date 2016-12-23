@@ -75,27 +75,6 @@ rescue CrxPackageManager::ApiError => e
 end
 
 begin
-  # Update a package
-  ssc = [{
-      'upload': true
-  }].to_json.to_s
-  ss = File.new('/Users/stopp/Downloads/aem-local.jpeg')
-  result = api_instance.update(
-      '/etc/packages/my_packages/test-1.zip',
-      'test',
-      group_name: 'my_packages',
-      version: 1,
-      screenshot: ss,
-      screenshot_config: ssc
-  )
-  data = JSON.parse(result).to_hash
-  status = CrxPackageManager::UpdateStatus.new(data)
-  p "Package update: #{status}"
-rescue CrxPackageManager::ApiError => e
-  puts "Exception when calling DefaultApi->update: #{e}"
-end
-
-begin
   # Service list help.
   result = api_instance.service_get('help', name: 'test1')
   puts result
@@ -104,7 +83,7 @@ begin
   data = response.build_from_hash(hash)
   p "Service Response: #{data.response}"
 rescue CrxPackageManager::ApiError => e
-  puts "Exception when calling DefaultApi->service: #{e}"
+  puts "Exception when calling DefaultApi->service_get: #{e}"
 end
 
 begin
@@ -112,15 +91,18 @@ begin
   package = File.new('/Users/stopp/Downloads/acs-aem-commons-content-3.4.0-min.zip')
   result = api_instance.service_post(
       package,
-      name: '/etc/packages/my_packages/acs-aem-commons-content-test.zip',
+      name: 'acs-aem-commons-content-test.zip',
       install: true,
       force: false,
       strict: true
   )
-  hash = XmlSimple.xml_in(result, ForceArray: false, KeyToSymbol: true)
-  puts result
-  puts "Service package upload: #{hash[:response][:data][:package][:name]}"
-  puts "Service package upload Status: #{hash[:response][:status]['code']}"
+  hash = XmlSimple.xml_in(result, ForceArray: false, KeyToSymbol: true, AttrToSymbol: true)
+  response = CrxPackageManager::ServiceResponse.new
+  data = response.build_from_hash(hash)
+  #puts "Service package upload: #{hash[:response][:data][:package][:name]}"
+  puts "Service package upload: #{data.response}"
+  puts "Service package Status: #{data.response.status[:code]}"
+
 rescue CrxPackageManager::ApiError => e
-  puts "Exception when calling DefaultApi->update: #{e}"
+  puts "Exception when calling DefaultApi->service_post: #{e}"
 end
