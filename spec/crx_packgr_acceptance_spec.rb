@@ -102,6 +102,7 @@ begin
   #puts "Service package upload: #{hash[:response][:data][:package][:name]}"
   puts "Service package upload: #{data.response}"
   puts "Service package Status: #{data.response.status[:code]}"
+  puts "Service package Status: #{data.response.status[:content]}"
 
 rescue CrxPackageManager::ApiError => e
   puts "Exception when calling DefaultApi->service_post: #{e}"
