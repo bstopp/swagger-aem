@@ -259,6 +259,53 @@ paths:
           $ref: '#/responses/NotFound'
         '500':
           $ref: '#/responses/ServerError'
+  /service/exec.json/etc/packages/{group}/{name}-{version}.zip:
+    post:
+      summary: Generic operation service.
+      description: Provides a different API for executing package manipulation commands. Operates on a specific version of the package.
+      operationId: service_exec
+      produces:
+        - application/json
+      parameters:
+        - name: cmd
+          in: query
+          description: The command to execute.
+          required: true
+          type: string
+          enum:
+            - build
+            - install
+            - delete
+            - uninstall
+            - dryrun
+            - replicate
+        - name: name
+          in: path
+          description: The name of the package on which to execute the command.
+          required: true
+          type: string
+        - name: group
+          in: path
+          description: The group of the package on which to execute the command.
+          required: true
+          type: string
+        - name: version
+          in: path
+          description: The version of the package on which to execute the command.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/ServiceExecResponse'
+        '302':
+          $ref: '#/responses/LoginRedirect'
+        '401':
+          $ref: '#/responses/Unauthorized'
+        '500':
+          $ref: '#/responses/ServerError'
+
   /thumbnail.jsp:
     get:
       summary: Get package thumbnail
@@ -478,6 +525,13 @@ definitions:
             properties:
               code:
                 type: int
+  ServiceExecResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      msg:
+        type: string
   UpdateStatus:
     type: object
     properties:
