@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # Load the gem
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'client', 'sling', 'lib'))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'clients', 'sling', 'lib'))
 
 require 'apache_sling_api_client'
 require 'json'
@@ -22,4 +22,6 @@ begin
 rescue ApacheSling::ApiError => e
   puts "Exception when calling DefaultApi->resource: #{e}"
 end
+
+
 

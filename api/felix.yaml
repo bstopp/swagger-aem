@@ -20,11 +20,32 @@ schemes:
 paths:
   /bundles.json:
     get:
-      summary: Bundles list
+      summary: List bundles
       description: List all the bundles in the Felix system. Properties for a bundle will not be populated.
       operationId: bundles
       produces:
         - application/json
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/BundleList'
+        '500':
+          $ref: '#/responses/ServerError'
+  /bundles/{bundleId}.json:
+    get:
+      summary: Bundle Info
+      description:
+        Display all information about a bundle. Same response structure as bundle listing; only one entry exists in the list.
+      operationId: bundle_info
+      produces:
+        - application/json
+      parameters:
+        - name: bundleId
+          in: path
+          description: The symbolic name or id of the bundle.
+          required: true
+          type: string
       responses:
         '200':
           description: Successful
@@ -44,6 +65,9 @@ definitions:
         type: string
       fragment:
         type: boolean
+      stateRaw:
+        type: integer
+        format: int64
       state:
         type: string
         enum:
