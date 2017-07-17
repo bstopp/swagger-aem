@@ -1,0 +1,256 @@
+swagger: '2.0'
+info:
+  title: Apache Felix WebConsole
+  description: Client for Apache Felix Web Console API. List bundles, configure services, etc.
+  contact:
+    name: Bryan Stopp
+    email: bryan.stopp@gmail.com
+  license:
+    name: Apache-2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 4.3.0
+
+host: localhost:8080
+basePath: /system/console
+tags:
+  - name: bundle
+    description: Operations on bundles.
+  - name: config
+    description: Operations on configurations.
+
+schemes:
+  - http
+  - https
+
+paths:
+  /bundles:
+    post:
+      tags:
+        - bundle
+      summary: Modify bundles operation.
+      description: Take action on all bundles - refresh packages. (See org.apache.felix.webconsole.internal.core.BundlesServlet.java)
+      operationId: refreshPackages
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: action
+          in: formData
+          description: The action to execute. Only allowed value is 'refreshPackages', must be provided. Limitation of Swagger.
+          required: true
+          type: string
+          enum:
+            - refreshPackages
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/BundleList'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+  /bundles.json:
+    get:
+      tags:
+        - bundle
+      summary: List bundles
+      description: List all the bundles in the Felix system. Properties for a bundle will not be populated. (See org.apache.felix.webconsole.internal.core.BundlesServlet.java)
+      operationId: list
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/BundleList'
+        '500':
+          $ref: '#/responses/ServerError'
+  /bundles/{bundleSymbolicName}:
+    post:
+      tags:
+        - bundle
+      summary: Modify bundles operation.
+      description: Take action on a bundle; start, stop, update, refresh, uninstall. (See org.apache.felix.webconsole.internal.core.BundlesServlet.java)
+      operationId: modify
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: bundleSymbolicName
+          in: path
+          description: The OSGi Symbolic name of the bundle.
+          required: true
+          type: string
+        - name: action
+          in: formData
+          description: The action to execute.
+          required: true
+          type: string
+          enum:
+            - start
+            - stop
+            - update
+            - refresh
+            - uninstall
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/BundleState'
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+  /bundles/{bundleId}.json:
+    get:
+      tags:
+        - bundle
+      summary: Bundle Info
+      description:
+        Display all information about a bundle, including properties. The returned list will contain one entry, the requested bundle. (See org.apache.felix.webconsole.internal.core.BundlesServlet.java)
+      operationId: info
+      produces:
+        - application/json
+      parameters:
+        - name: bundleId
+          in: path
+          description: The symbolic name or id of the bundle.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful
+          schema:
+            $ref: '#/definitions/BundleList'
+        '500':
+          $ref: '#/responses/ServerError'
+  /bundles/install:
+    post:
+      tags:
+        - bundle
+      summary: Upload a bundle.
+      description: Install the provided bundle. (See org.apache.felix.webconsole.internal.core.BundlesServlet.java)
+      operationId: install
+      consumes:
+        - multipart/form-data
+      parameters:
+        - name: bundlefile
+          in: formData
+          description: The bundle to upload.
+          required: true
+          type: file
+        - name: action
+          in: formData
+          description: The action to execute. Only allowed value is 'install', must be provided. Limitation of Swagger.
+          required: true
+          type: string
+          enum:
+            - install
+        - name: bundlestart
+          in: formData
+          description: Flag to indicate whether or not bundle should be started.
+          type: boolean
+        - name: bundlestartlevel
+          in: formData
+          description: The start level of the provided bundle.
+          type: integer
+          format: int32
+        - name: refreshPackages
+          in: formData
+          description: Flag to indicate whether or not to refresh all pacakges once installed.
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+
+definitions:
+  Bundle:
+    description: Details about a bundle.
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      fragment:
+        type: boolean
+      stateRaw:
+        type: integer
+        format: int64
+      state:
+        type: string
+        enum:
+          - Uninstalled
+          - Installed
+          - Resolved
+          - Starting
+          - Stopping
+          - Active
+          - Fragment
+      version:
+        type: string
+      symbolicName:
+        type: string
+      category:
+        type: string
+      props:
+        type: array
+        items:
+          type: object
+          properties:
+            key:
+              type: string
+            value:
+              type: array
+              items:
+                type: string
+  BundleList:
+    description: List of bundles
+    type: object
+    properties:
+      status:
+        type: string
+      s:
+        type: array
+        items:
+          type: string
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Bundle'
+  BundleState:
+    description: State of a bundle; see `org.osgi.framework.Bundle.java` for meaning of state values.
+    type: object
+    properties:
+      fragment:
+        type: boolean
+      stateRaw:
+        type: integer
+        format: int32
+
+responses:
+  LoginRedirect:
+    description: Redirected to Login
+  Unauthorized:
+    description: Unauthorized
+  Forbidden:
+    description: Forbidden (ACL)
+  NotFound:
+    description: Not Found
+  ServerError:
+    description: Server Error
+
+securityDefinitions:
+  basic:
+    type: basic
+
+security:
+  - basic: []
+
+externalDocs:
+  description: Apache Felix Documentation
+  url: http://felix.apache.org/documentation.html

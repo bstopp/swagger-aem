@@ -1,8 +1,0 @@
-{
-  "gemName": "apache_felix_api_client",
-  "gemHomepage": "https://github.com/bstopp/apache-felix-api-client-gem",
-  "moduleName": "ApacheFelix",
-  "gemVersion": "0.1.1",
-  "gitUserId": "bstopp",
-  "gitRepoId": "apache-felix-api-client-gem"
-}

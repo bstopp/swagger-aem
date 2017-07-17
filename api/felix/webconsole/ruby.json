@@ -1,0 +1,14 @@
+{
+  "gemName": "apache_felix_webconsole_client",
+  "gemHomepage": "https://github.com/bstopp/apache-felix-webconsole-client-gem",
+  "moduleName": "ApacheFelix",
+  "gemVersion": "0.0.1",
+  "gitUserId": "bstopp",
+  "gitRepoId": "apache-felix-webconsole-client-gem",
+
+  "gemLicense": "Apache-2.0",
+  "gemSummary": "Apache Felix WebConsole Client",
+  "gemDescription": "Client for Apache Felix Web Console API. List bundles, configure services, etc.",
+  "gemAuthor": "Bryan Stopp",
+  "gemAuthorEmail": "bryan.stopp@gmail.com"
+}
