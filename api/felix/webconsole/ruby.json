@@ -2,7 +2,7 @@
   "gemName": "apache_felix_webconsole_client",
   "gemHomepage": "https://github.com/bstopp/apache-felix-webconsole-client-gem",
   "moduleName": "ApacheFelix",
-  "gemVersion": "0.1.0",
+  "gemVersion": "0.1.1",
   "gitUserId": "bstopp",
   "gitRepoId": "apache-felix-webconsole-client-gem",
 
