@@ -15,7 +15,7 @@ basePath: /system/console
 tags:
   - name: bundle
     description: Operations on bundles.
-  - name: config
+  - name: configMgr
     description: Operations on configurations.
 
 schemes:
@@ -166,6 +166,29 @@ paths:
         '500':
           $ref: '#/responses/ServerError'
 
+  /configMgr/{pid}.json:
+    get:
+      tags:
+        - configMgr
+      summary: Get the configurations for a OSGi Component
+      description:
+      operationId: get
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: pid
+          in: path
+          description: The Persistent Identity of the configuration to retrieve.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful
+        '404':
+          $ref: '#/responses/NotFound'
+        '500':
+          $ref: '#/responses/ServerError'
+
 definitions:
   Bundle:
     description: Details about a bundle.
@@ -223,7 +246,7 @@ definitions:
         items:
           $ref: '#/definitions/Bundle'
   BundleState:
-    description: State of a bundle; see `org.osgi.framework.Bundle.java` for meaning of state values.
+    descrxiption: State of a bundle; see `org.osgi.framework.Bundle.java` for meaning of state values.
     type: object
     properties:
       fragment:

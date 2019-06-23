@@ -14,7 +14,7 @@ GIT_ROOT = 'git@github.com'.freeze
 
 #SWAGGER_CMD = 'swagger-codegen'.freeze
 
-SWAGGER_CMD = "java -XX:MaxPermSize=256M -Xmx1024M -DloggerPath=conf/log4j.properties -jar #{project_basedir}/bin/swagger-codegen-cli-2.2.1.jar"
+SWAGGER_CMD = "java -XX:MaxPermSize=256M -Xmx1024M -DloggerPath=conf/log4j.properties -jar #{project_basedir}/bin/swagger-codegen-cli-2.4.5.jar"
 OUTPUT_BASE = File.join(project_basedir, 'clients', 'felix', api).freeze
 
 files.each do |file|

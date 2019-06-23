@@ -108,4 +108,8 @@ describe 'Webconsole API' do
       expect(result.data[0]).to_not be(nil)
     end
   end
+
+  describe 'ConfigMgr' do
+
+  end
 end
